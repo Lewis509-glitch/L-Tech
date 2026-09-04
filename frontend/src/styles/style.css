@@ -26,6 +26,7 @@ nav {
     background-color: var(--nav-background-color);
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
+    box-shadow: 0 4px 6px var(--secondary-color);
 }
 
 nav ul {
