@@ -29,6 +29,14 @@ The API runs on `http://localhost:3000` by default.
 
 The API serves the static site from the project root, so open `http://localhost:3000/blogs.html` after starting the server. This keeps the Blogs page and API on the same origin.
 
+## Deploying to Vercel
+
+Set the Vercel project root directory to `server/`. Vercel will use `vercel.json` to route requests to the Express API. Add these Vercel environment variables for Production, Preview, and Development as needed:
+
+- `MONGODB_URI`
+- `MONGODB_DB_NAME`
+- `CORS_ORIGIN`
+
 ## PWA
 
 Open the site through `http://localhost:3000/home.html` or a deployed HTTPS URL. The service worker requires HTTPS in production and caches the main app shell for offline navigation. API requests remain online-only so blog data is not cached as stale content.

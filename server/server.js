@@ -170,7 +170,9 @@ try {
     database = mongoClient.db(databaseName);
     imageBucket = new GridFSBucket(database, { bucketName: 'blogImages' });
     await getPostCollection().createIndex({ createdAt: -1 });
-    app.listen(port, () => console.log(`L-Tech blog API listening on http://localhost:${port}`));
+    if (process.env.VERCEL !== '1') {
+        app.listen(port, () => console.log(`L-Tech blog API listening on http://localhost:${port}`));
+    }
 } catch (error) {
     console.error('MongoDB connection failed:', error.message);
     process.exitCode = 1;
@@ -182,3 +184,5 @@ const close = async () => {
 };
 process.on('SIGINT', close);
 process.on('SIGTERM', close);
+
+export default app;
