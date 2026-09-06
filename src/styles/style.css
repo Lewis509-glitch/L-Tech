@@ -904,6 +904,13 @@ nav ul li a:hover {
     gap: 1.25rem;
 }
 
+.blog-empty {
+    padding: 1.5rem;
+    border: 1px dashed rgba(248, 249, 250, 0.25);
+    color: #cbd6e0;
+    line-height: 1.6;
+}
+
 .blog-post {
     overflow: hidden;
 }

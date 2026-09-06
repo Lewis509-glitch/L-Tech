@@ -1,0 +1,19 @@
+{
+  "name": "L-Tech Solutions",
+  "short_name": "L-Tech",
+  "description": "Software development, selected projects, community blogs, and digital experiences by L-Tech Solutions.",
+  "start_url": "/home.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#14243E",
+  "theme_color": "#14243E",
+  "icons": [
+    {
+      "src": "/src/assets/logo.png",
+      "sizes": "50x50",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

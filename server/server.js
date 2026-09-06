@@ -3,12 +3,15 @@ import cors from 'cors';
 import express from 'express';
 import multer from 'multer';
 import { GridFSBucket, MongoClient, ObjectId } from 'mongodb';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
-const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5500';
+const corsOrigin = process.env.CORS_ORIGIN || `https://ltechsolutions.netlify.app`;
 const mongoUri = process.env.MONGODB_URI;
-const databaseName = process.env.MONGODB_DB_NAME || 'ltech';
+const databaseName = process.env.MONGODB_DB_NAME || 'L-Tech';
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 if (!mongoUri) {
     throw new Error('MONGODB_URI is required. Copy server/.env.example to server/.env and set it.');
@@ -38,6 +41,7 @@ const getPostCollection = () => database.collection('posts');
 
 app.use(cors({ origin: corsOrigin }));
 app.use(express.json({ limit: '1mb' }));
+app.use(express.static(projectRoot));
 
 app.get('/api/health', (_request, response) => {
     response.json({ status: 'ok' });
@@ -105,10 +109,12 @@ app.get('/api/images/:id', async (request, response, next) => {
 app.post('/api/blogs/:id/like', async (request, response, next) => {
     try {
         if (!isValidId(request.params.id)) return response.status(400).json({ error: 'Invalid post id.' });
+        const delta = Number(request.body.delta);
+        if (![1, -1].includes(delta)) return response.status(400).json({ error: 'Like delta must be 1 or -1.' });
         const postId = new ObjectId(request.params.id);
         const result = await getPostCollection().findOneAndUpdate(
             { _id: postId },
-            { $inc: { likes: 1 }, $set: { updatedAt: new Date() } },
+            { $inc: { likes: delta }, $set: { updatedAt: new Date() } },
             { returnDocument: 'after' }
         );
         if (!result) return response.status(404).json({ error: 'Post not found.' });

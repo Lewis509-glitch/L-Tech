@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#14243E">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Blogs | L-Tech Solutions</title>
+    <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="/src/styles/style.css">
     <link rel="shortcut icon" href="/src/assets/logo.png" type="image/x-icon">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="apple-touch-icon" href="/src/assets/logo.png">
+    <script src="/src/pwa-register.js" defer></script>
 </head>
 <body>
     <header class="blog-header">
@@ -69,7 +75,7 @@
     </main>
 
     <script>
-        const storageKey = 'ltech-blog-posts';
+        const apiBase = window.LTECH_API_URL || 'http://localhost:3000/api';
         const blogForm = document.querySelector('#blog-form');
         const imageInput = document.querySelector('#post-image');
         const imagePreview = document.querySelector('#image-preview');
@@ -77,21 +83,7 @@
         const postCount = document.querySelector('#post-count');
         const formStatus = document.querySelector('#form-status');
 
-        const defaultPosts = [
-            {
-                id: 'welcome-post',
-                author: 'L-Tech Solutions',
-                title: 'Welcome to the L-Tech community',
-                body: 'This is a space for sharing ideas, lessons, and the work that keeps us curious. Publish your first story and start a conversation.',
-                image: '',
-                likes: 0,
-                liked: false,
-                comments: [],
-                createdAt: new Date().toISOString()
-            }
-        ];
-
-        let posts = JSON.parse(localStorage.getItem(storageKey) || 'null') || defaultPosts;
+        let posts = [];
         let selectedImage = '';
 
         const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, (character) => ({
@@ -102,17 +94,22 @@
             dateStyle: 'medium', timeStyle: 'short'
         }).format(new Date(date));
 
-        const savePosts = () => localStorage.setItem(storageKey, JSON.stringify(posts));
+        const getPostId = (post) => post._id || post.id;
+        const getImageUrl = (post) => post.imageId ? `${apiBase}/images/${post.imageId}` : '';
+
+        const showError = (error) => {
+            formStatus.textContent = error.message || 'Unable to complete that request.';
+        };
 
         const renderPosts = () => {
             postCount.textContent = `${posts.length} ${posts.length === 1 ? 'post' : 'posts'}`;
             postsList.innerHTML = posts.map((post) => `
-                <article class="blog-post" data-post-id="${escapeHtml(post.id)}">
+                <article class="blog-post" data-post-id="${escapeHtml(getPostId(post))}">
                     <div class="post-meta">
                         <span class="author-avatar">${escapeHtml(post.author.charAt(0).toUpperCase())}</span>
                         <div><strong>${escapeHtml(post.author)}</strong><time datetime="${escapeHtml(post.createdAt)}">${formatDate(post.createdAt)}</time></div>
                     </div>
-                    ${post.image ? `<img class="post-image" src="${escapeHtml(post.image)}" alt="Image shared in ${escapeHtml(post.title)}">` : ''}
+                    ${getImageUrl(post) ? `<img class="post-image" src="${escapeHtml(getImageUrl(post))}" alt="Image shared in ${escapeHtml(post.title)}">` : ''}
                     <div class="post-content">
                         <h3>${escapeHtml(post.title)}</h3>
                         <p>${escapeHtml(post.body).replace(/\n/g, '<br>')}</p>
@@ -151,36 +148,43 @@
             reader.readAsDataURL(file);
         });
 
-        blogForm.addEventListener('submit', (event) => {
+        blogForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-            const formData = new FormData(blogForm);
-            posts.unshift({
-                id: crypto.randomUUID(),
-                author: formData.get('author').trim(),
-                title: formData.get('title').trim(),
-                body: formData.get('body').trim(),
-                image: selectedImage,
-                likes: 0,
-                liked: false,
-                comments: [],
-                createdAt: new Date().toISOString()
-            });
-            savePosts();
-            renderPosts();
-            blogForm.reset();
-            selectedImage = '';
-            imagePreview.hidden = true;
-            formStatus.textContent = 'Your post has been published.';
+            formStatus.textContent = 'Publishing your post...';
+            try {
+                const response = await fetch(`${apiBase}/blogs`, { method: 'POST', body: new FormData(blogForm) });
+                if (!response.ok) throw new Error((await response.json()).error || 'Unable to publish your post.');
+                posts.unshift(await response.json());
+                renderPosts();
+                blogForm.reset();
+                selectedImage = '';
+                imagePreview.hidden = true;
+                formStatus.textContent = 'Your post has been published.';
+            } catch (error) {
+                showError(error);
+            }
         });
 
         postsList.addEventListener('click', async (event) => {
             const button = event.target.closest('[data-action]');
             if (!button) return;
-            const post = posts.find((item) => item.id === button.closest('[data-post-id]').dataset.postId);
+            const post = posts.find((item) => getPostId(item) === button.closest('[data-post-id]').dataset.postId);
             if (!post) return;
             if (button.dataset.action === 'like') {
-                post.liked = !post.liked;
-                post.likes += post.liked ? 1 : -1;
+                try {
+                    const delta = post.liked ? -1 : 1;
+                    const response = await fetch(`${apiBase}/blogs/${getPostId(post)}/like`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ delta })
+                    });
+                    if (!response.ok) throw new Error((await response.json()).error || 'Unable to update the like.');
+                    Object.assign(post, await response.json(), { liked: !post.liked });
+                    renderPosts();
+                } catch (error) {
+                    showError(error);
+                }
+                return;
             }
             if (button.dataset.action === 'focus-comment') {
                 button.closest('.blog-post').querySelector('input[name="comment"]').focus();
@@ -188,26 +192,54 @@
             }
             if (button.dataset.action === 'share') {
                 const shareData = { title: post.title, text: post.body, url: window.location.href };
-                if (navigator.share) await navigator.share(shareData);
-                else await navigator.clipboard.writeText(window.location.href);
-                formStatus.textContent = navigator.share ? 'Thanks for sharing.' : 'Post link copied to your clipboard.';
+                try {
+                    const response = await fetch(`${apiBase}/blogs/${getPostId(post)}/share`, { method: 'POST' });
+                    if (!response.ok) throw new Error('Unable to record the share.');
+                    Object.assign(post, await response.json());
+                    if (navigator.share) await navigator.share(shareData);
+                    else await navigator.clipboard.writeText(window.location.href);
+                    formStatus.textContent = navigator.share ? 'Thanks for sharing.' : 'Post link copied to your clipboard.';
+                } catch (error) {
+                    showError(error);
+                }
+                renderPosts();
+                return;
             }
-            savePosts();
-            renderPosts();
         });
 
-        postsList.addEventListener('submit', (event) => {
+        postsList.addEventListener('submit', async (event) => {
             if (!event.target.matches('.comment-form')) return;
             event.preventDefault();
             const postElement = event.target.closest('[data-post-id]');
-            const post = posts.find((item) => item.id === postElement.dataset.postId);
+            const post = posts.find((item) => getPostId(item) === postElement.dataset.postId);
             const commentInput = event.target.elements.comment;
-            post.comments.push({ author: 'You', text: commentInput.value.trim() });
-            savePosts();
-            renderPosts();
+            try {
+                const response = await fetch(`${apiBase}/blogs/${getPostId(post)}/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ author: 'You', text: commentInput.value.trim() })
+                });
+                if (!response.ok) throw new Error((await response.json()).error || 'Unable to add the comment.');
+                Object.assign(post, await response.json());
+                renderPosts();
+            } catch (error) {
+                showError(error);
+            }
         });
 
-        renderPosts();
+        const loadPosts = async () => {
+            try {
+                const response = await fetch(`${apiBase}/blogs`);
+                if (!response.ok) throw new Error('Unable to load blog posts.');
+                posts = await response.json();
+                renderPosts();
+            } catch (error) {
+                postsList.innerHTML = '<p class="blog-empty">Connect the Node.js API to load community posts.</p>';
+                showError(error);
+            }
+        };
+
+        loadPosts();
     </script>
 </body>
 </html>
