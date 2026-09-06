@@ -53,6 +53,70 @@ nav ul li a:hover {
     color: var(--hero-btn-color);
 }
 
+.top-menu {
+    position: relative;
+    margin-left: auto;
+}
+
+.top-menu summary {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid rgba(248, 249, 250, 0.2);
+    border-radius: 0.35rem;
+    color: var(--text-white-color);
+    cursor: pointer;
+    list-style: none;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.top-menu summary::-webkit-details-marker {
+    display: none;
+}
+
+.top-menu summary:hover,
+.top-menu[open] summary {
+    border-color: var(--hero-btn-color);
+    background-color: rgba(255, 165, 0, 0.12);
+}
+
+.top-menu summary i {
+    font-size: 1.3rem;
+}
+
+.top-menu-links {
+    position: absolute;
+    top: calc(100% + 0.65rem);
+    right: 0;
+    display: grid;
+    min-width: 10rem;
+    padding: 0.45rem;
+    border: 1px solid rgba(248, 249, 250, 0.15);
+    background-color: var(--nav-background-color);
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.25);
+}
+
+.top-menu-links a {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem;
+    color: var(--text-white-color);
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.top-menu-links a:hover {
+    background-color: rgba(255, 165, 0, 0.12);
+    color: var(--hero-btn-color);
+}
+
+.top-menu-links a i {
+    color: var(--hero-btn-color);
+    font-size: 1.2rem;
+}
+
 .mobile-nav {
     display: none;
     position: fixed;
@@ -563,6 +627,41 @@ nav ul li a:hover {
     font-size: 0.85rem;
 }
 
+.simple-page {
+    min-height: 100dvh;
+    padding: 8rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), #1c2a48);
+    color: var(--text-white-color);
+    text-align: center;
+}
+
+.simple-page h1 {
+    margin-top: 1rem;
+    color: var(--hero-name-color);
+    font-size: clamp(2.5rem, 7vw, 5rem);
+}
+
+.simple-page-copy {
+    max-width: 38rem;
+    margin: 1rem auto 0;
+    color: #dce3eb;
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+.simple-page-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-white-color);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.simple-page-back:hover {
+    color: var(--hero-btn-color);
+}
+
 @keyframes pulse {
     0% {
         transform: translate(-50%, -50%) scale(0.85);
@@ -604,6 +703,20 @@ nav ul li a:hover {
 
     .navigation {
         min-height: 3.5rem;
+    }
+
+    .top-menu {
+        margin-left: auto;
+    }
+
+    .top-menu summary span {
+        display: none;
+    }
+
+    .top-menu-links {
+        position: fixed;
+        top: 4rem;
+        right: 1rem;
     }
 
     .desktop-nav {
