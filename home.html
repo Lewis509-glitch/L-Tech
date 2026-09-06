@@ -115,7 +115,7 @@
                 <p class="project-type">Web development</p>
                 <h3>Responsive Portfolio</h3>
                 <p>A focused personal portfolio that presents work, skills, and contact information across every screen size.</p>
-                <a href="#contact" class="project-link">View project <i class='bx bx-right-arrow-alt'></i></a>
+                <a href="https://ltechsolutions.netlify.app/" class="project-link" target="_blank" rel="noopener noreferrer">View project <i class='bx bx-right-arrow-alt'></i></a>
             </article>
 
             <article class="project-card">
@@ -124,7 +124,7 @@
                 <p class="project-type">Productivity</p>
                 <h3>Task Management Tool</h3>
                 <p>A simple workflow for organizing priorities, tracking progress, and keeping important work visible.</p>
-                <a href="#contact" class="project-link">View project <i class='bx bx-right-arrow-alt'></i></a>
+                <a href="https://kerumainsda.netlify.app/" class="project-link" target="_blank" rel="noopener noreferrer">View project <i class='bx bx-right-arrow-alt'></i></a>
             </article>
 
             <article class="project-card">
@@ -133,9 +133,61 @@
                 <p class="project-type">Data and insights</p>
                 <h3>Insight Dashboard</h3>
                 <p>A clean dashboard concept that turns important information into clear, actionable decisions.</p>
-                <a href="#contact" class="project-link">View project <i class='bx bx-right-arrow-alt'></i></a>
+                <a href="https://kyline.netlify.app/" class="project-link" target="_blank" rel="noopener noreferrer">View project <i class='bx bx-right-arrow-alt'></i></a>
             </article>
         </div>
     </section>
+
+    <footer id="contact" class="site-footer">
+        <div class="footer-main">
+            <div class="footer-brand">
+                <a href="#home" class="footer-logo">
+                    <img src="/src/assets/logo.png" alt="L-Tech Solutions Logo" width="42">
+                    <span>L-Tech Solutions</span>
+                </a>
+                <p>Thoughtful software, practical solutions, and digital experiences built to make an impact.</p>
+            </div>
+
+            <div class="footer-column">
+                <h3>Explore</h3>
+                <a href="#about">About me</a>
+                <a href="#services">Projects</a>
+                <a href="#home">Back to top</a>
+            </div>
+
+            <div class="footer-column">
+                <h3>Connect</h3>
+                <a href="mailto:hello@ltechsolutions.com">hello@ltechsolutions.com</a>
+                <a href="tel:+254115903200">+254 115 903 200</a>
+                <div class="footer-socials">
+                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class='bx bxl-twitter'></i></a>
+                    <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class='bx bxl-linkedin'></i></a>
+                    <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class='bx bxl-github'></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 L-Tech Solutions. Built with purpose.</p>
+            <span>Available for meaningful projects</span>
+        </div>
+    </footer>
+
+    <script>
+        const mobileLinks = document.querySelectorAll('.mobile-nav a[href^="#"]');
+        const observedSections = document.querySelectorAll('section[id], footer[id]');
+
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    mobileLinks.forEach((link) => {
+                        link.classList.toggle('is-active', link.getAttribute('href') === `#${entry.target.id}`);
+                    });
+                }
+            });
+        }, { rootMargin: '-35% 0px -55% 0px' });
+
+        observedSections.forEach((section) => sectionObserver.observe(section));
+    </script>
 </body>
 </html>
