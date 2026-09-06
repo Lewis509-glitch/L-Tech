@@ -42,3 +42,32 @@ nav ul li a {
     font-weight: bold;
     transition: color 0.3s ease;
 }
+
+section .home {
+    display: flex;
+    background-color: var(--primary-color);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100dvh;
+    text-align: center;
+    color: var(--text-white-color);
+}
+
+section .home h1 {
+    font-size: 3rem;
+    color: var(--text-white-color);
+    margin-bottom: 1rem;
+}
+
+section .home h2 {
+    font-size: 2.5rem;
+    color: var(--text-white-color);
+    margin-bottom: 1rem;
+}
+
+section .home p {
+    font-size: 1.2rem;
+    color: var(--text-white-color);
+    margin-bottom: 2rem;
+} 
