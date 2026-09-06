@@ -12,6 +12,7 @@
     --text-color: #212529;
     --nav-background-color: #1C2A48;
     --hero-name-color: #fef6b4;
+    --hero-btn-color: orange;
 }
 
 body {
@@ -29,6 +30,7 @@ nav {
     box-shadow: 0 4px 6px var(--secondary-color);
     position: fixed;
     width: 100%;
+    z-index: 10;
 }
 
 nav ul {
@@ -43,6 +45,22 @@ nav ul li a {
     color: var(--text-white-color);
     font-weight: bold;
     transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: var(--hero-btn-color);
+}
+
+.mobile-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--nav-background-color);
+    padding: 0.5rem 0;
+    box-shadow: 0 -4px 6px var(--secondary-color);
+    align-items: center;
+    z-index: 20;
 }
 
 .home {
@@ -61,19 +79,211 @@ nav ul li a {
 }
 
 .home h1 {
-    font-size: 3rem;
+    font-size: clamp(2rem, 4vw, 3rem);
     color: var(--text-white-color);
     margin-bottom: 1rem;
 }
 
 .home h2 {
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 4vw, 3rem);
     color: var(--hero-name-color);
     margin-bottom: 1rem;
 }
 
 .home p {
-    font-size: 1.2rem;
+    font-size: clamp(1rem, 2vw, 1.5rem);
     color: var(--text-white-color);
     margin-bottom: 2rem;
 } 
+
+.home .btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    margin-right: 1rem;
+    background-color: var(--hero-btn-color);
+    color: var(--primary-color);
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.home .contact-me:hover {
+    background-color: var(--text-white-color);
+    color: var(--primary-color);
+}
+
+.home .cv {
+    Background: transparent;
+    border: 2px solid var(--hero-btn-color);
+    color: var(--hero-btn-color);
+}
+
+.home .cv:hover {
+    background-color: var(--hero-btn-color);
+    color: var(--primary-color);
+}
+
+.follow-me {
+    margin-top: 2rem;
+}
+
+.follow-me a {
+    color: var(--text-white-color);
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    transition: color 0.3s ease;
+}
+
+.follow-me a:hover {
+    color: var(--hero-btn-color);
+}
+
+
+
+.home .profile {
+    max-width: 400px;
+    margin: 4rem;
+    text-align: center;
+    width: 100%;
+
+}
+
+.home .profile img {
+    width: 100%;
+    border-radius: 50%;
+}
+
+.home .profile img::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: var(--hero-btn-color);
+    opacity: 0;
+    animation: pulse 2s infinite;
+    transition: opacity 0.3s ease;
+}
+
+.home .profile img::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: var(--hero-btn-color);
+    opacity: 0;
+    animation: pulse 2s infinite;
+    transition: opacity 0.3s ease;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+    }
+
+    .navigation {
+        min-height: 3.5rem;
+    }
+
+    .desktop-nav {
+        display: none;
+    }
+
+    .mobile-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        min-height: 3.5rem;
+        padding: 0.5rem max(1rem, env(safe-area-inset-left)) max(0.5rem, env(safe-area-inset-bottom));
+        background-color: var(--nav-background-color);
+    }
+
+    .mobile-nav ul {
+        display: flex;
+        width: 100%;
+        list-style: none;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    .mobile-nav ul li a {
+        display: grid;
+        place-items: center;
+        min-width: 2.75rem;
+        min-height: 2.5rem;
+        text-decoration: none;
+        color: var(--text-white-color);
+        font-weight: bold;
+        transition: color 0.3s ease;
+    }
+
+    .mobile-nav ul li a i {
+        font-size: 1.5rem;
+    }
+
+    .home {
+        min-height: 100dvh;
+        height: auto;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1.5rem;
+        padding: 5rem 1.25rem 6rem;
+    }
+
+    .home .content {
+        width: 100%;
+        max-width: 36rem;
+        margin: 0;
+        text-align: center;
+    }
+
+    .home h1,
+    .home h2 {
+        font-size: clamp(1.75rem, 10vw, 2.5rem);
+    }
+
+    .home p {
+        font-size: clamp(1rem, 4.5vw, 1.25rem);
+        margin-bottom: 1.5rem;
+    }
+
+    .home .btn {
+        margin: 0.25rem;
+        padding: 0.7rem 1rem;
+    }
+
+    .follow-me {
+        margin-top: 1.5rem;
+    }
+
+    .home .profile {
+        width: min(68vw, 16rem);
+        margin: 0;
+    }
+
+    .home .profile img {
+        display: block;
+    }
+}
