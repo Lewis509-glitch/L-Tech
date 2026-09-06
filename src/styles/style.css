@@ -11,6 +11,7 @@
     --text-white-color: #F8F9FA;
     --text-color: #212529;
     --nav-background-color: #1C2A48;
+    --hero-name-color: #fef6b4;
 }
 
 body {
@@ -22,11 +23,12 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: .9rem 1rem;
     background-color: var(--nav-background-color);
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
     box-shadow: 0 4px 6px var(--secondary-color);
+    position: fixed;
+    width: 100%;
 }
 
 nav ul {
@@ -43,30 +45,34 @@ nav ul li a {
     transition: color 0.3s ease;
 }
 
-section .home {
+.home {
     display: flex;
-    background-color: var(--primary-color);
-    flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     height: 100dvh;
     text-align: center;
     color: var(--text-white-color);
 }
 
-section .home h1 {
+.home .content {
+    max-width: 600px;
+    margin: 4rem;
+    text-align: left;
+}
+
+.home h1 {
     font-size: 3rem;
     color: var(--text-white-color);
     margin-bottom: 1rem;
 }
 
-section .home h2 {
+.home h2 {
     font-size: 2.5rem;
-    color: var(--text-white-color);
+    color: var(--hero-name-color);
     margin-bottom: 1rem;
 }
 
-section .home p {
+.home p {
     font-size: 1.2rem;
     color: var(--text-white-color);
     margin-bottom: 2rem;
