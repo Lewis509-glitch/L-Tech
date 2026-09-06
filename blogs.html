@@ -9,11 +9,205 @@
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 </head>
 <body>
-    <main class="simple-page">
+    <header class="blog-header">
         <a class="simple-page-back" href="home.html"><i class='bx bx-arrow-back'></i> Back home</a>
-        <p class="section-kicker">L-Tech Solutions</p>
-        <h1>Blogs</h1>
-        <p class="simple-page-copy">Thoughts on software development, design, problem solving, and continuous learning.</p>
+        <a class="blog-brand" href="home.html">
+            <img src="/src/assets/logo.png" alt="L-Tech Solutions Logo" width="42">
+            <span>L-Tech Solutions</span>
+        </a>
+        <span class="blog-header-spacer" aria-hidden="true"></span>
+    </header>
+
+    <main class="blog-page">
+        <section class="blog-intro">
+            <p class="section-kicker">Community stories</p>
+            <h1>Ideas worth sharing.</h1>
+            <p>Publish your thoughts, share your work, and join the conversation around technology and creativity.</p>
+        </section>
+
+        <section class="blog-layout" aria-label="Blog publishing and posts">
+            <form id="blog-form" class="blog-composer">
+                <div class="composer-heading">
+                    <div>
+                        <p class="section-kicker">Create a post</p>
+                        <h2>Share something with the community</h2>
+                    </div>
+                    <i class='bx bx-edit-alt' aria-hidden="true"></i>
+                </div>
+
+                <label for="post-author">Your name</label>
+                <input id="post-author" name="author" type="text" placeholder="e.g. Lewis Gichigo" maxlength="60" required>
+
+                <label for="post-title">Post title</label>
+                <input id="post-title" name="title" type="text" placeholder="What would you like to share?" maxlength="120" required>
+
+                <label for="post-body">Your story</label>
+                <textarea id="post-body" name="body" rows="6" placeholder="Write your thoughts, lessons, or ideas..." maxlength="3000" required></textarea>
+
+                <label class="image-upload" for="post-image">
+                    <i class='bx bx-image-add' aria-hidden="true"></i>
+                    <span><strong>Add an image</strong><small>PNG, JPG, GIF, or WEBP up to 2 MB</small></span>
+                </label>
+                <input id="post-image" name="image" type="file" accept="image/png,image/jpeg,image/gif,image/webp">
+                <img id="image-preview" class="image-preview" alt="Selected blog image preview" hidden>
+
+                <button class="blog-submit" type="submit">Publish post <i class='bx bx-send'></i></button>
+                <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
+            </form>
+
+            <div class="blog-feed">
+                <div class="feed-heading">
+                    <div>
+                        <p class="section-kicker">Latest posts</p>
+                        <h2>From the community</h2>
+                    </div>
+                    <span id="post-count" class="post-count">0 posts</span>
+                </div>
+                <div id="posts-list" class="posts-list"></div>
+            </div>
+        </section>
     </main>
+
+    <script>
+        const storageKey = 'ltech-blog-posts';
+        const blogForm = document.querySelector('#blog-form');
+        const imageInput = document.querySelector('#post-image');
+        const imagePreview = document.querySelector('#image-preview');
+        const postsList = document.querySelector('#posts-list');
+        const postCount = document.querySelector('#post-count');
+        const formStatus = document.querySelector('#form-status');
+
+        const defaultPosts = [
+            {
+                id: 'welcome-post',
+                author: 'L-Tech Solutions',
+                title: 'Welcome to the L-Tech community',
+                body: 'This is a space for sharing ideas, lessons, and the work that keeps us curious. Publish your first story and start a conversation.',
+                image: '',
+                likes: 0,
+                liked: false,
+                comments: [],
+                createdAt: new Date().toISOString()
+            }
+        ];
+
+        let posts = JSON.parse(localStorage.getItem(storageKey) || 'null') || defaultPosts;
+        let selectedImage = '';
+
+        const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, (character) => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;'
+        }[character]));
+
+        const formatDate = (date) => new Intl.DateTimeFormat('en', {
+            dateStyle: 'medium', timeStyle: 'short'
+        }).format(new Date(date));
+
+        const savePosts = () => localStorage.setItem(storageKey, JSON.stringify(posts));
+
+        const renderPosts = () => {
+            postCount.textContent = `${posts.length} ${posts.length === 1 ? 'post' : 'posts'}`;
+            postsList.innerHTML = posts.map((post) => `
+                <article class="blog-post" data-post-id="${escapeHtml(post.id)}">
+                    <div class="post-meta">
+                        <span class="author-avatar">${escapeHtml(post.author.charAt(0).toUpperCase())}</span>
+                        <div><strong>${escapeHtml(post.author)}</strong><time datetime="${escapeHtml(post.createdAt)}">${formatDate(post.createdAt)}</time></div>
+                    </div>
+                    ${post.image ? `<img class="post-image" src="${escapeHtml(post.image)}" alt="Image shared in ${escapeHtml(post.title)}">` : ''}
+                    <div class="post-content">
+                        <h3>${escapeHtml(post.title)}</h3>
+                        <p>${escapeHtml(post.body).replace(/\n/g, '<br>')}</p>
+                    </div>
+                    <div class="post-actions">
+                        <button class="post-action ${post.liked ? 'is-liked' : ''}" data-action="like" type="button"><i class='bx ${post.liked ? 'bxs-heart' : 'bx-heart'}'></i><span>${post.likes}</span> Like</button>
+                        <button class="post-action" data-action="focus-comment" type="button"><i class='bx bx-message-rounded'></i><span>${post.comments.length}</span> Comment</button>
+                        <button class="post-action" data-action="share" type="button"><i class='bx bx-share-alt'></i> Share</button>
+                    </div>
+                    <div class="comments-panel">
+                        ${post.comments.map((comment) => `<p><strong>${escapeHtml(comment.author)}</strong> ${escapeHtml(comment.text)}</p>`).join('')}
+                        <form class="comment-form">
+                            <input name="comment" type="text" maxlength="240" placeholder="Write a comment..." aria-label="Write a comment" required>
+                            <button type="submit" aria-label="Post comment"><i class='bx bx-send'></i></button>
+                        </form>
+                    </div>
+                </article>
+            `).join('');
+        };
+
+        imageInput.addEventListener('change', () => {
+            const file = imageInput.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) {
+                imageInput.value = '';
+                formStatus.textContent = 'Please choose an image smaller than 2 MB.';
+                return;
+            }
+            const reader = new FileReader();
+            reader.addEventListener('load', () => {
+                selectedImage = reader.result;
+                imagePreview.src = selectedImage;
+                imagePreview.hidden = false;
+                formStatus.textContent = '';
+            });
+            reader.readAsDataURL(file);
+        });
+
+        blogForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const formData = new FormData(blogForm);
+            posts.unshift({
+                id: crypto.randomUUID(),
+                author: formData.get('author').trim(),
+                title: formData.get('title').trim(),
+                body: formData.get('body').trim(),
+                image: selectedImage,
+                likes: 0,
+                liked: false,
+                comments: [],
+                createdAt: new Date().toISOString()
+            });
+            savePosts();
+            renderPosts();
+            blogForm.reset();
+            selectedImage = '';
+            imagePreview.hidden = true;
+            formStatus.textContent = 'Your post has been published.';
+        });
+
+        postsList.addEventListener('click', async (event) => {
+            const button = event.target.closest('[data-action]');
+            if (!button) return;
+            const post = posts.find((item) => item.id === button.closest('[data-post-id]').dataset.postId);
+            if (!post) return;
+            if (button.dataset.action === 'like') {
+                post.liked = !post.liked;
+                post.likes += post.liked ? 1 : -1;
+            }
+            if (button.dataset.action === 'focus-comment') {
+                button.closest('.blog-post').querySelector('input[name="comment"]').focus();
+                return;
+            }
+            if (button.dataset.action === 'share') {
+                const shareData = { title: post.title, text: post.body, url: window.location.href };
+                if (navigator.share) await navigator.share(shareData);
+                else await navigator.clipboard.writeText(window.location.href);
+                formStatus.textContent = navigator.share ? 'Thanks for sharing.' : 'Post link copied to your clipboard.';
+            }
+            savePosts();
+            renderPosts();
+        });
+
+        postsList.addEventListener('submit', (event) => {
+            if (!event.target.matches('.comment-form')) return;
+            event.preventDefault();
+            const postElement = event.target.closest('[data-post-id]');
+            const post = posts.find((item) => item.id === postElement.dataset.postId);
+            const commentInput = event.target.elements.comment;
+            post.comments.push({ author: 'You', text: commentInput.value.trim() });
+            savePosts();
+            renderPosts();
+        });
+
+        renderPosts();
+    </script>
 </body>
 </html>
